@@ -1,33 +1,22 @@
 <script setup lang="ts">
-import { object, string, type InferType } from "yup";
+import { object, string } from "yup";
+import { reactive } from "vue";
 import type { FormSubmitEvent } from "#ui/types";
 
-import { useRegistrationStore } from "../stores/Auth";
-
 const schema = object({
-  name: string()
-    .required("full name is required")
-    .matches(/^[a-zA-Z\s]+$/, "Full name can only contain letters"),
-  username: string()
-    .required("username is required")
-    .matches(/^[a-zA-Z\s]+$/, "username can only contain letters"),
-  email: string().email("Invalid email").required("Email is required"),
+  email: string().email("Invalid email").required("Required"),
   password: string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
-  confirm_Password: string()
-    .required("Please confirm your password")
-    .test("passwords-match", "Passwords must match", function (value) {
-      return value === this.parent.password;
-    }),
+    .min(8, "Must be at least 8 characters")
+    .required("Required"),
 });
 
-type Schema = InferType<typeof schema>;
+const state = reactive({
+  email: "",
+  password: "",
+});
 
-const state = useRegistrationStore();
-
-async function onSignup(event: FormSubmitEvent<Schema>) {
-  await state.signup();
+async function onSubmit(event: FormSubmitEvent) {
+  console.log(event.data);
 }
 </script>
 
@@ -36,32 +25,14 @@ async function onSignup(event: FormSubmitEvent<Schema>) {
     :schema="schema"
     :state="state"
     class="w-[300px] px-5 pb-12"
-    @submit.prevent="onSignup"
+    @submit="onSubmit"
   >
-    <UFormGroup name="name" class="w-full mb-5">
-      <label for="name" class="text-gray-600 pb-2">Full Name</label>
-      <input
-        type="text"
-        v-model="state.name"
-        name="text"
-        class="bg-white mt-2 outline-non px-2 text-black w-full border border-gray-100 py-1"
-        placeholder="enter your full name "
-      />
-    </UFormGroup>
-    <UFormGroup name="username" class="w-full mb-5">
-      <label for="username" class="text-gray-600 pb-2">Username</label>
-      <input
-        type="text"
-        v-model="state.username"
-        class="bg-white mt-2 outline-non px-2 text-black w-full border border-gray-100 py-1"
-        placeholder="enter your username "
-      />
-    </UFormGroup>
     <UFormGroup name="email" class="w-full mb-5">
       <label for="email" class="text-gray-600 pb-2">Email</label>
       <input
         type="text"
         v-model="state.email"
+        name="text"
         class="bg-white mt-2 outline-non px-2 text-black w-full border border-gray-100 py-1"
         placeholder="enter your email or username"
       />
@@ -78,21 +49,12 @@ async function onSignup(event: FormSubmitEvent<Schema>) {
       />
     </UFormGroup>
 
-    <UFormGroup name="confirm_Password" class="w-full mb-5">
-      <label for="confirm_Password" class="text-gray-600 pb-2"
-        >Conform Password</label
-      >
-      <input
-        type="password"
-        v-model="state.confirm_Password"
-        name="text"
-        class="bg-white mt-2 outline-non px-2 text-black w-full border border-gray-100 py-1"
-        placeholder="conform password"
-      />
-    </UFormGroup>
+    <NuxtLink class="flex self-end mb-2 text-blue-600 right-0" to="#"
+      >forgot password ?</NuxtLink
+    >
 
     <UButton type="submit" class="mt-3 py-2 text-white" color="blue" block>
-      sign up
+      sign in
     </UButton>
   </UForm>
 </template>
